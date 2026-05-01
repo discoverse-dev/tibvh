@@ -16,7 +16,7 @@ __description__ = (
     "A high-performance Taichi-based Linear BVH implementation for 3D geometry "
     "processing"
 )
-__url__ = "https://github.com/TATP-233/tibvh"
+__url__ = "https://github.com/discoverse-dev/tibvh"
 __license__ = "MIT"
 
 __all__ = [

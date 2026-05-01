@@ -66,9 +66,9 @@ examples = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/TATP-233/tibvh"
-Repository = "https://github.com/TATP-233/tibvh"
-Issues = "https://github.com/TATP-233/tibvh/issues"
+Homepage = "https://github.com/discoverse-dev/tibvh"
+Repository = "https://github.com/discoverse-dev/tibvh"
+Issues = "https://github.com/discoverse-dev/tibvh/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tibvh"]

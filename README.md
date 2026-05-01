@@ -14,7 +14,7 @@ A high-performance Python package for 3D spatial data structures and geometry pr
 ### Install from Source
 
 ```bash
-git clone https://github.com/TATP-233/tibvh.git
+git clone https://github.com/discoverse-dev/tibvh.git
 cd tibvh
 uv sync
 ```
