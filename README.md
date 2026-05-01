@@ -6,10 +6,10 @@ A high-performance Python package for 3D spatial data structures and geometry pr
 
 ### Requirements
 
-- Python 3.8+
-- Taichi 1.6.0+
-- NumPy 1.19.0+
-- PyTorch 1.10.0+
+- Python 3.10 - 3.13
+- Taichi 1.7.4
+- NumPy 1.26+
+- PyTorch 2.7.0
 
 ### Install from Source
 
@@ -18,6 +18,10 @@ git clone https://github.com/TATP-233/tibvh.git
 cd tibvh
 uv sync
 ```
+
+`pyproject.toml` pins `torch==2.7.0`, keeps NumPy in a bounded range, and routes
+Linux installs to the PyTorch CUDA wheel index so `uv` does not have to search
+an unnecessarily wide solution space.
 
 For development tools:
 

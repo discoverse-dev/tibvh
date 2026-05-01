@@ -19,6 +19,21 @@ from .aabb import AABB
 ti_bool = ti.u1
 
 
+def _select_torch_sort_device() -> str:
+    """Select the Torch device for Morton-code sorting once per process."""
+    if torch.cuda.is_available():
+        return "cuda"
+
+    mps_backend = getattr(torch.backends, "mps", None)
+    if mps_backend is not None and mps_backend.is_available():
+        return "mps"
+
+    return "cpu"
+
+
+DEFAULT_TORCH_SORT_DEVICE = _select_torch_sort_device()
+
+
 @ti.data_oriented
 class LBVH:
     """
@@ -55,6 +70,7 @@ class LBVH:
         self.aabb_manager = aabb_manager
         self.max_aabbs = aabb_manager.max_n_aabbs
         self.n_aabbs = 0
+        self._torch_sort_device = DEFAULT_TORCH_SORT_DEVICE
 
         # 性能统计相关
         self.profiling = profiling
@@ -174,6 +190,13 @@ class LBVH:
         if self.profiling:
             self.timing_stats = {}
 
+    def _sort_morton_codes(self):
+        """Use the selected Torch backend to sort Morton codes."""
+        morton_codes = self.morton_codes.to_torch(device=self._torch_sort_device)
+        value, idx = morton_codes[:, 0].to(torch.int64).sort()
+        sorted_codes = torch.concatenate([value.unsqueeze(1), idx.unsqueeze(1)], dim=1)
+        self.morton_codes.from_torch(sorted_codes.to(torch.uint32))
+
     def build(self):
         """
         构建BVH树
@@ -197,14 +220,8 @@ class LBVH:
         self.compute_morton_codes()
         self._end_timing("2_compute_morton_codes", start_time)
 
-        start_time = self._start_timing("2_compute_morton_codes")
-        value, idx = (
-            self.morton_codes.to_torch(device="cuda")[:, 0].to(torch.int64).sort()
-        )
-        morton_code = torch.concatenate(
-            [value.unsqueeze(1), idx.unsqueeze(1)], dim=1
-        ).to(torch.uint32)
-        self.morton_codes.from_torch(morton_code)
+        start_time = self._start_timing("3_sort")
+        self._sort_morton_codes()
         self._end_timing("3_sort", start_time)
 
         start_time = self._start_timing("4_build_tree")
