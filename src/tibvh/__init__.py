@@ -7,7 +7,7 @@ from .geometry import aabb_generator, geom_intersection, utils
 from .lbvh.aabb import AABB
 from .lbvh.lbvh import LBVH
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __author__ = "Yufei Jia"
 __email__ = "jyf23@mails.tsinghua.edu.cn"
 
