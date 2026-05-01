@@ -19,9 +19,9 @@ cd tibvh
 uv sync
 ```
 
-`pyproject.toml` pins `torch==2.7.0`, keeps NumPy in a bounded range, and routes
-Linux installs to the PyTorch CUDA wheel index so `uv` does not have to search
-an unnecessarily wide solution space.
+`pyproject.toml` pins `torch==2.7.0` and keeps NumPy in a bounded range. The
+checked-in `uv.lock` includes wheels for macOS and Linux, including the Linux
+NVIDIA runtime packages required by PyTorch on x86_64.
 
 For development tools:
 
