@@ -103,9 +103,9 @@ def ray_box_distance(ray_start, ray_direction, center, size, rotation):
 
     # 处理局部坐标系中的射线方向为零的情况
     inv_dir = ti.math.vec3(
-        1.0 / (local_direction.x if ti.abs(local_direction.x) > 1e-6 else 1e10),
-        1.0 / (local_direction.y if ti.abs(local_direction.y) > 1e-6 else 1e10),
-        1.0 / (local_direction.z if ti.abs(local_direction.z) > 1e-6 else 1e10),
+        1.0 / local_direction.x if ti.abs(local_direction.x) > 1e-6 else 1e10,
+        1.0 / local_direction.y if ti.abs(local_direction.y) > 1e-6 else 1e10,
+        1.0 / local_direction.z if ti.abs(local_direction.z) > 1e-6 else 1e10,
     )
 
     t_min = -1e10
