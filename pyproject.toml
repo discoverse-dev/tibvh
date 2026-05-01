@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
 
 [project]
 name = "tibvh"
@@ -8,22 +8,22 @@ version = "0.1.2"
 description = "A high-performance Taichi-based Linear BVH implementation for 3D geometry processing"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 authors = [
-    {name = "TIBVH Contributors", email = "contributors@example.com"},
+    { name = "Yufei Jia", email = "jyf23@mails.tsinghua.edu.cn" },
 ]
 maintainers = [
-    {name = "TIBVH Contributors", email = "contributors@example.com"},
+    { name = "Yufei Jia", email = "jyf23@mails.tsinghua.edu.cn" },
 ]
 keywords = [
-    "bvh",
-    "taichi", 
-    "geometry",
     "3d",
+    "bvh",
+    "collision-detection",
+    "computer-graphics",
+    "geometry",
     "ray-tracing",
     "spatial-data-structures",
-    "collision-detection",
-    "computer-graphics"
+    "taichi",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -37,132 +37,122 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Graphics :: 3D Modeling",
+    "Topic :: Multimedia :: Graphics :: 3D Rendering",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Multimedia :: Graphics :: 3D Modeling",
-    "Topic :: Multimedia :: Graphics :: 3D Rendering"
 ]
 dependencies = [
-    "taichi>=1.6.0",
     "numpy>=1.19.0",
-    "torch>=1.10.0"
+    "taichi>=1.6.0",
+    "torch>=1.10.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "pytest>=6.0",
-    "pytest-cov>=2.0",
-    "black>=22.0",
-    "isort>=5.0",
-    "flake8>=4.0",
-    "mypy>=0.910",
-    "pre-commit>=2.15.0"
+    "mypy>=1.8",
+    "pre-commit>=3.5",
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.8",
 ]
 docs = [
+    "myst-parser>=0.17.0",
     "sphinx>=4.0",
     "sphinx-rtd-theme>=1.0",
-    "myst-parser>=0.17.0"
 ]
 examples = [
+    "jupyter>=1.0",
     "matplotlib>=3.0",
-    "jupyter>=1.0"
 ]
 
 [project.urls]
-homepage = "https://github.com/yourorg/tibvh"
-documentation = "https://tibvh.readthedocs.io"
-repository = "https://github.com/yourorg/tibvh"
-"Bug Tracker" = "https://github.com/yourorg/tibvh/issues"
+Homepage = "https://github.com/TATP-233/tibvh"
+Repository = "https://github.com/TATP-233/tibvh"
+Issues = "https://github.com/TATP-233/tibvh/issues"
 
-[tool.setuptools]
-package-dir = {"" = "."}
+[tool.hatch.build.targets.wheel]
+packages = ["src/tibvh"]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["tibvh*"]
-exclude = ["tests*"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+    "/src",
+]
 
-[tool.setuptools.package-data]
-"*" = ["*.py", "py.typed"]
-
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
+src = ["src"]
+target-version = "py38"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["tibvh"]
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+]
+ignore = [
+    "E501",
+    "E741",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tibvh"]
+
+[tool.ruff.format]
+docstring-code-format = true
+indent-style = "space"
+line-ending = "lf"
+quote-style = "double"
 
 [tool.mypy]
+mypy_path = "src"
+packages = ["tibvh"]
 python_version = "3.8"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
 
 [[tool.mypy.overrides]]
 module = [
     "taichi.*",
-    "torch.*"
+    "torch.*",
 ]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+pythonpath = ["src"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
-    "--strict-markers",
     "--strict-config",
+    "--strict-markers",
     "--verbose",
 ]
 markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
 
 [tool.coverage.run]
 source = ["tibvh"]
 omit = [
-    "*/tests/*",
     "*/test_*",
+    "*/tests/*",
 ]
 
 [tool.coverage.report]
 exclude_lines = [
-    "pragma: no cover",
+    "@(abc\\.)?abstractmethod",
+    "class .*\\bProtocol\\):",
     "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
     "if 0:",
     "if __name__ == \"__main__\":",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
 ]

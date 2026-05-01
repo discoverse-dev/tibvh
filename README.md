@@ -16,7 +16,24 @@ A high-performance Python package for 3D spatial data structures and geometry pr
 ```bash
 git clone https://github.com/TATP-233/tibvh.git
 cd tibvh
-pip install -e .
+uv sync
+```
+
+For development tools:
+
+```bash
+uv sync --group dev
+```
+
+## Development
+
+This project uses a `src/tibvh` package layout and keeps the local virtual
+environment in `.venv` through uv.
+
+```bash
+uv run --only-group dev ruff format .
+uv run --only-group dev ruff check .
+uv build
 ```
 
 ### Supported Geometry Types

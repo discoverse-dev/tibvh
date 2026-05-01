@@ -2,6 +2,12 @@
 *__pycache__
 .DS_Store
 *.pyc
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+build/
 models/*
 .vscode/*
 dist/

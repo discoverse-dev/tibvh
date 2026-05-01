@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff
+        entry: uv run --only-group dev ruff check
+        language: system
+        types_or: [python, pyi]
+        args: ["--fix"]
+      - id: ruff-format
+        name: ruff format
+        entry: uv run --only-group dev ruff format
+        language: system
+        types_or: [python, pyi]

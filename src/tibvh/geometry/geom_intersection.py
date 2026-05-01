@@ -5,7 +5,7 @@
 
 支持的几何体类型：
 - PLANE (0): 平面
-- SPHERE (2): 球体  
+- SPHERE (2): 球体
 - CAPSULE (3): 胶囊体
 - ELLIPSOID (4): 椭球体
 - CYLINDER (5): 圆柱体
@@ -13,7 +13,9 @@
 """
 
 import taichi as ti
-from .utils import _transform_ray_to_local, _transform_point_to_world
+
+from .utils import _transform_ray_to_local
+
 
 @ti.func
 def ray_triangle_distance(ray_start, ray_direction, v0, v1, v2):
@@ -38,11 +40,14 @@ def ray_triangle_distance(ray_start, ray_direction, v0, v1, v2):
                     t_ret = t
     return t_ret
 
+
 @ti.func
 def ray_plane_distance(ray_start, ray_direction, center, size, rotation):
     """返回射线与平面命中距离 t；未命中返回 -1.0"""
     # 转换射线到平面的局部坐标系
-    local_start, local_direction = _transform_ray_to_local(ray_start, ray_direction, center, rotation)
+    local_start, local_direction = _transform_ray_to_local(
+        ray_start, ray_direction, center, rotation
+    )
 
     # 在局部坐标系中，平面的法向量是 z 轴
     normal = ti.math.vec3(0.0, 0.0, 1.0)
@@ -63,6 +68,7 @@ def ray_plane_distance(ray_start, ray_direction, center, size, rotation):
                 t_ret = t
 
     return t_ret
+
 
 @ti.func
 def ray_sphere_distance(ray_start, ray_direction, center, size, rotation):
@@ -86,17 +92,20 @@ def ray_sphere_distance(ray_start, ray_direction, center, size, rotation):
 
     return t_ret
 
+
 @ti.func
 def ray_box_distance(ray_start, ray_direction, center, size, rotation):
     """返回射线与盒子命中距离 t；未命中返回 -1.0"""
     # 转换射线到盒子的局部坐标系
-    local_start, local_direction = _transform_ray_to_local(ray_start, ray_direction, center, rotation)
+    local_start, local_direction = _transform_ray_to_local(
+        ray_start, ray_direction, center, rotation
+    )
 
     # 处理局部坐标系中的射线方向为零的情况
     inv_dir = ti.math.vec3(
         1.0 / (local_direction.x if ti.abs(local_direction.x) > 1e-6 else 1e10),
         1.0 / (local_direction.y if ti.abs(local_direction.y) > 1e-6 else 1e10),
-        1.0 / (local_direction.z if ti.abs(local_direction.z) > 1e-6 else 1e10)
+        1.0 / (local_direction.z if ti.abs(local_direction.z) > 1e-6 else 1e10),
     )
 
     t_min = -1e10
@@ -127,13 +136,16 @@ def ray_box_distance(ray_start, ray_direction, center, size, rotation):
             t_ret = t
     return t_ret
 
+
 @ti.func
 def ray_cylinder_distance(ray_start, ray_direction, center, size, rotation):
     """返回射线与圆柱体命中距离 t；未命中返回 -1.0
     size.x: 半径，size.z: 半高
     """
     # 转换射线到圆柱体的局部坐标系
-    local_start, local_direction = _transform_ray_to_local(ray_start, ray_direction, center, rotation)
+    local_start, local_direction = _transform_ray_to_local(
+        ray_start, ray_direction, center, rotation
+    )
 
     radius = size[0]
     half_height = size[2]
@@ -204,11 +216,14 @@ def ray_cylinder_distance(ray_start, ray_direction, center, size, rotation):
 
     return t_ret
 
+
 @ti.func
 def ray_ellipsoid_distance(ray_start, ray_direction, center, size, rotation):
     """返回射线与椭球体命中距离 t；未命中返回 -1.0"""
     # 转换射线到椭球体的局部坐标系
-    local_start, local_direction = _transform_ray_to_local(ray_start, ray_direction, center, rotation)
+    local_start, local_direction = _transform_ray_to_local(
+        ray_start, ray_direction, center, rotation
+    )
 
     # 将问题转换为单位球相交，通过缩放空间
     inv_size = ti.math.vec3(1.0 / size.x, 1.0 / size.y, 1.0 / size.z)
@@ -217,12 +232,12 @@ def ray_ellipsoid_distance(ray_start, ray_direction, center, size, rotation):
     scaled_start = ti.math.vec3(
         local_start.x * inv_size.x,
         local_start.y * inv_size.y,
-        local_start.z * inv_size.z
+        local_start.z * inv_size.z,
     )
     scaled_dir = ti.math.vec3(
         local_direction.x * inv_size.x,
         local_direction.y * inv_size.y,
-        local_direction.z * inv_size.z
+        local_direction.z * inv_size.z,
     )
 
     # 解二次方程 at² + bt + c = 0
@@ -241,13 +256,16 @@ def ray_ellipsoid_distance(ray_start, ray_direction, center, size, rotation):
 
     return t_ret
 
+
 @ti.func
 def ray_capsule_distance(ray_start, ray_direction, center, size, rotation):
     """返回射线与胶囊体命中距离 t；未命中返回 -1.0
     在 MuJoCo 中: size.x 为半径，size.z 为圆柱部分半高
     """
     # 转换射线到胶囊体的局部坐标系
-    local_start, local_direction = _transform_ray_to_local(ray_start, ray_direction, center, rotation)
+    local_start, local_direction = _transform_ray_to_local(
+        ray_start, ray_direction, center, rotation
+    )
 
     radius = size[0]
     half_height = size[2]
@@ -262,8 +280,11 @@ def ray_capsule_distance(ray_start, ray_direction, center, size, rotation):
 
     # 先测试圆柱体侧面与端盖
     cylinder_t = ray_cylinder_distance(
-        local_start, local_direction,
-        ti.math.vec3(0.0, 0.0, 0.0), cylinder_size, identity_mat
+        local_start,
+        local_direction,
+        ti.math.vec3(0.0, 0.0, 0.0),
+        cylinder_size,
+        identity_mat,
     )
 
     # 初始化最小距离
@@ -275,14 +296,18 @@ def ray_capsule_distance(ray_start, ray_direction, center, size, rotation):
     sphere_size = ti.math.vec3(radius, radius, radius)
 
     # 上半球
-    t1 = ray_sphere_distance(local_start, local_direction, sphere1_center, sphere_size, identity_mat)
+    t1 = ray_sphere_distance(
+        local_start, local_direction, sphere1_center, sphere_size, identity_mat
+    )
     if t1 >= 0 and t1 < min_t:
         local_hit = local_start + t1 * local_direction
         if (local_hit.z - sphere1_center.z) >= 0:  # 半球裁剪
             min_t = t1
 
     # 下半球
-    t2 = ray_sphere_distance(local_start, local_direction, sphere2_center, sphere_size, identity_mat)
+    t2 = ray_sphere_distance(
+        local_start, local_direction, sphere2_center, sphere_size, identity_mat
+    )
     if t2 >= 0 and t2 < min_t:
         local_hit = local_start + t2 * local_direction
         if (local_hit.z - sphere2_center.z) <= 0:
